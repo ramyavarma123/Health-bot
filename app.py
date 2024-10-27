@@ -125,7 +125,7 @@ def create_demo() -> gr.Blocks:
     chatbot = MedicalChatBot()
 
     with gr.Blocks(css=CUSTOM_CSS) as demo:
-        gr.Markdown("# 🏥 AI Medical Assistant")
+        gr.Markdown("# 🏥 HealthMate AI")
         gr.Markdown("""
         Welcome! I'm an AI medical assistant designed to provide general medical information.
         Please note that I'm not a replacement for professional medical care.
