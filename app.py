@@ -189,6 +189,8 @@
 
 
 
+
+
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
@@ -271,17 +273,8 @@ class MedicalChatBot:
         self.conversation_history: deque = deque(maxlen=self.MAX_HISTORY)
         self.decision_tree = None
         self.symptom_columns = []
-        self.medication_map = self.create_medication_map()  # Create medication map
         self.load_data_and_train_model()
         self.initialize_system()
-
-    def create_medication_map(self) -> Dict[str, List[str]]:
-        """Create a mapping of diseases to their recommended medications"""
-        return {
-            "DiseaseA": ["MedicationA1", "MedicationA2"],
-            "DiseaseB": ["MedicationB1", "MedicationB2"],
-            # Add other diseases and medications as necessary
-        }
 
     def load_data_and_train_model(self):
         """Load datasets and train the Decision Tree model"""
@@ -318,10 +311,8 @@ class MedicalChatBot:
             symptoms = self.extract_symptoms(user_input)
             prognosis_response = ""
             if symptoms:
-                disease, medications = self.predict_prognosis(symptoms)
-                prognosis_response = f"Based on your symptoms, the likely condition is: {disease}.\n"
-                prognosis_response += f"Recommended medications: {', '.join(medications)}."
-
+                prognosis_response = self.predict_prognosis(symptoms)
+            
             # Create chat messages for response
             messages = [
                 {"role": "system", "content": self.system_prompt},
@@ -337,7 +328,7 @@ class MedicalChatBot:
             # Combine AI response with prognosis if available
             full_response = response.choices[0].message.content
             if prognosis_response:
-                full_response += f"\n\n{prognosis_response}"
+                full_response += f"\n\nBased on your symptoms, the likely condition is: {prognosis_response}."
             
             return full_response
             
@@ -356,16 +347,15 @@ class MedicalChatBot:
             ChatMessage(role="assistant", content=bot_response, timestamp=timestamp)
         )
 
-    def predict_prognosis(self, symptoms: List[str]) -> Tuple[str, List[str]]:
+    def predict_prognosis(self, symptoms: List[str]) -> str:
         """Predict prognosis based on symptoms"""
         input_vector = np.zeros(len(self.symptom_columns))
         for symptom in symptoms:
             if symptom in self.symptom_columns:
                 input_vector[self.symptom_columns.index(symptom)] = 1
 
-        disease = self.decision_tree.predict([input_vector])[0]
-        medications = self.medication_map.get(disease, ["No medications found."])
-        return disease, medications
+        prediction = self.decision_tree.predict([input_vector])[0]
+        return prediction
 
     def extract_symptoms(self, user_input: str) -> List[str]:
         """Extract symptoms mentioned in user input"""
@@ -410,4 +400,8 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Failed to launch interface: {str(e)}")
 
+
+
+    
+   
 
