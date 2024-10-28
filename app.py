@@ -280,7 +280,7 @@ class MedicalChatBot:
         """Load datasets and train the Decision Tree model"""
         # Load datasets
         train_data = pd.read_csv("Training.csv")
-        test_data = pd.read_csv("C:/Users/saman/OneDrive/Desktop/minor-project/minor proj/Data/Testing.csv")
+        test_data = pd.read_csv("Testing.csv")
 
         # Separate features and target from training data
         X_train = train_data.drop(columns=['prognosis'])
