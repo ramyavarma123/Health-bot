@@ -301,7 +301,7 @@ class MedicalChatBot:
         2. Provide medical advice based on symptoms
         3. Recommend when to seek immediate medical attention
         4. Always maintain professional medical ethics
-        5. Clearly state you are an AI and not a replacement for real doctors
+        # 5. Clearly state you are an AI and not a replacement for real doctors
         """
 
     def generate_response(self, user_input: str) -> str:
