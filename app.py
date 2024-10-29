@@ -83,33 +83,15 @@ class MedicalChatBot:
         self.load_data_and_train_model()
         self.initialize_system()
 
-    # def load_data_and_train_model(self):
-    #     """Load datasets and train the Decision Tree model"""
-    #     # Load datasets
-    #     train_data = pd.read_csv("Training.csv")
-    #     test_data = pd.read_csv("Testing.csv")
-
-    #     # Separate features and target from training data
-    #     X_train = train_data.drop(columns=['prognosis'])
-    #     y_train = train_data['prognosis']
-
-    #     # Train the Decision Tree model
-    #     self.decision_tree = DecisionTreeClassifier(random_state=0)
-    #     self.decision_tree.fit(X_train, y_train)
-
-    #     # Store the symptom columns for predictions
-    #     self.symptom_columns = X_train.columns.tolist()
     def load_data_and_train_model(self):
         """Load datasets and train the Decision Tree model"""
         # Load datasets
         train_data = pd.read_csv("Training.csv")
         test_data = pd.read_csv("Testing.csv")
 
-        # Separate features and target from training and test data
+        # Separate features and target from training data
         X_train = train_data.drop(columns=['prognosis'])
         y_train = train_data['prognosis']
-        X_test = test_data.drop(columns=['prognosis'])
-        y_test = test_data['prognosis']
 
         # Train the Decision Tree model
         self.decision_tree = DecisionTreeClassifier(random_state=0)
@@ -117,11 +99,6 @@ class MedicalChatBot:
 
         # Store the symptom columns for predictions
         self.symptom_columns = X_train.columns.tolist()
-
-        # Make predictions on the test set and calculate accuracy
-        y_pred = self.decision_tree.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        logger.info(f"Test Accuracy of the Decision Tree model: {accuracy * 100:.2f}%")
 
     def initialize_system(self) -> None:
         """Initialize system with medical context"""
@@ -191,47 +168,16 @@ class MedicalChatBot:
         """Extract symptoms mentioned in user input"""
         return [symptom for symptom in self.symptom_columns if symptom.lower() in user_input.lower()]
 
-# def create_demo() -> gr.Blocks:
-#     """Create Gradio interface with professional styling"""
-#     chatbot = MedicalChatBot()
-
-#     with gr.Blocks(css=CUSTOM_CSS) as demo:
-#         gr.Markdown("# 🏥 HealthMate AI")
-#         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
-
-#         chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True,type='messages')
-        
-#         msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
-
-#         with gr.Row():
-#             submit = gr.Button("Send", variant="primary")
-#             clear = gr.Button("Clear Chat", variant="secondary")
-
-#         def user_input(message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[str, str]]]:
-#             bot_response = chatbot.generate_response(message)
-#             chatbot._update_history(message, bot_response)
-#             history.append((message, bot_response))
-#             return "", history
-
-#         def clear_history() -> List[Tuple[str, str]]:
-#             chatbot.conversation_history.clear()
-#             return []
-
-#         submit.click(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
-#         clear.click(clear_history, outputs=[chatbot_component])
-#         msg.submit(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
-
-#     return demo
 def create_demo() -> gr.Blocks:
     """Create Gradio interface with professional styling"""
-    chatbot = MedicalChatBot()
+    chatbot = MedicalChatBot(type="messages")
 
     with gr.Blocks(css=CUSTOM_CSS) as demo:
+        # chatbot = gr.Chatbot(type="messages")
         gr.Markdown("# 🏥 HealthMate AI")
         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
 
-        # Specify type='messages' for the chatbot component
-        chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True, type='messages')
+        chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True)
         
         msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
 
@@ -255,16 +201,9 @@ def create_demo() -> gr.Blocks:
 
     return demo
 
-
 if __name__ == "__main__":
     try:
         demo = create_demo()
-        demo.launch(server_port=7862, share=True)
+        demo.launch(server_port=7861, share=True)
     except Exception as e:
         logger.error(f"Failed to launch interface: {str(e)}")
-
-
-
-    
-   
-
