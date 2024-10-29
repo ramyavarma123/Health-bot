@@ -170,7 +170,7 @@ class MedicalChatBot:
 
 def create_demo() -> gr.Blocks:
     """Create Gradio interface with professional styling"""
-    chatbot = MedicalChatBot(type="messages")
+    chatbot = MedicalChatBot()
 
     with gr.Blocks(css=CUSTOM_CSS) as demo:
         # chatbot = gr.Chatbot(type="messages")
