@@ -199,7 +199,7 @@ class MedicalChatBot:
 #         gr.Markdown("# 🏥 HealthMate AI")
 #         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
 
-#         chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True)
+#         chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True,type='messages')
         
 #         msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
 
