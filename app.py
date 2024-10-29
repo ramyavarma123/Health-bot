@@ -83,15 +83,33 @@ class MedicalChatBot:
         self.load_data_and_train_model()
         self.initialize_system()
 
+    # def load_data_and_train_model(self):
+    #     """Load datasets and train the Decision Tree model"""
+    #     # Load datasets
+    #     train_data = pd.read_csv("Training.csv")
+    #     test_data = pd.read_csv("Testing.csv")
+
+    #     # Separate features and target from training data
+    #     X_train = train_data.drop(columns=['prognosis'])
+    #     y_train = train_data['prognosis']
+
+    #     # Train the Decision Tree model
+    #     self.decision_tree = DecisionTreeClassifier(random_state=0)
+    #     self.decision_tree.fit(X_train, y_train)
+
+    #     # Store the symptom columns for predictions
+    #     self.symptom_columns = X_train.columns.tolist()
     def load_data_and_train_model(self):
         """Load datasets and train the Decision Tree model"""
         # Load datasets
         train_data = pd.read_csv("Training.csv")
         test_data = pd.read_csv("Testing.csv")
 
-        # Separate features and target from training data
+        # Separate features and target from training and test data
         X_train = train_data.drop(columns=['prognosis'])
         y_train = train_data['prognosis']
+        X_test = test_data.drop(columns=['prognosis'])
+        y_test = test_data['prognosis']
 
         # Train the Decision Tree model
         self.decision_tree = DecisionTreeClassifier(random_state=0)
@@ -99,6 +117,11 @@ class MedicalChatBot:
 
         # Store the symptom columns for predictions
         self.symptom_columns = X_train.columns.tolist()
+
+        # Make predictions on the test set and calculate accuracy
+        y_pred = self.decision_tree.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        logger.info(f"Test Accuracy of the Decision Tree model: {accuracy * 100:.2f}%")
 
     def initialize_system(self) -> None:
         """Initialize system with medical context"""
