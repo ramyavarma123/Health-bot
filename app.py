@@ -226,7 +226,7 @@ def create_demo() -> gr.Blocks:
 if __name__ == "__main__":
     try:
         demo = create_demo()
-        demo.launch(server_port=7860, share=True)
+        demo.launch(server_port=7862, share=True)
     except Exception as e:
         logger.error(f"Failed to launch interface: {str(e)}")
 
