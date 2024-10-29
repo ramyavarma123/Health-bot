@@ -86,8 +86,8 @@ class MedicalChatBot:
     def load_data_and_train_model(self):
         """Load datasets and train the Decision Tree model"""
         # Load datasets
-        train_data = pd.read_csv("Training.csv")
-        test_data = pd.read_csv("Testing.csv")
+        train_data = pd.read_csv('C:/Users/saman/OneDrive/Desktop/minor-project/minor proj/Data/Training.csv')
+        test_data = pd.read_csv("C:/Users/saman/OneDrive/Desktop/minor-project/minor proj/Data/Testing.csv")
 
         # Separate features and target from training data
         X_train = train_data.drop(columns=['prognosis'])
@@ -108,7 +108,7 @@ class MedicalChatBot:
         2. Provide medical advice based on symptoms
         3. Recommend when to seek immediate medical attention
         4. Always maintain professional medical ethics
-        # 5. Clearly state you are an AI and not a replacement for real doctors
+        5. Clearly state you are an AI and not a replacement for real doctors
         """
 
     def generate_response(self, user_input: str) -> str:
@@ -173,7 +173,6 @@ def create_demo() -> gr.Blocks:
     chatbot = MedicalChatBot()
 
     with gr.Blocks(css=CUSTOM_CSS) as demo:
-        # chatbot = gr.Chatbot(type="messages")
         gr.Markdown("# 🏥 HealthMate AI")
         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
 
@@ -204,6 +203,6 @@ def create_demo() -> gr.Blocks:
 if __name__ == "__main__":
     try:
         demo = create_demo()
-        demo.launch(server_port=7861, share=True)
+        demo.launch(server_port=7860, share=True)
     except Exception as e:
         logger.error(f"Failed to launch interface: {str(e)}")
