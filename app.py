@@ -1,7 +1,3 @@
-import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-import numpy as np
 from typing import List, Dict, Optional, Tuple
 import gradio as gr
 from g4f.client import Client
@@ -78,27 +74,7 @@ class MedicalChatBot:
     def __init__(self) -> None:
         self.client = Client()
         self.conversation_history: deque = deque(maxlen=self.MAX_HISTORY)
-        self.decision_tree = None
-        self.symptom_columns = []
-        self.load_data_and_train_model()
         self.initialize_system()
-
-    def load_data_and_train_model(self):
-        """Load datasets and train the Decision Tree model"""
-        # Load datasets
-        train_data = pd.read_csv('Training.csv')
-        test_data = pd.read_csv("Testing.csv")
-
-        # Separate features and target from training data
-        X_train = train_data.drop(columns=['prognosis'])
-        y_train = train_data['prognosis']
-
-        # Train the Decision Tree model
-        self.decision_tree = DecisionTreeClassifier(random_state=0)
-        self.decision_tree.fit(X_train, y_train)
-
-        # Store the symptom columns for predictions
-        self.symptom_columns = X_train.columns.tolist()
 
     def initialize_system(self) -> None:
         """Initialize system with medical context"""
@@ -114,13 +90,6 @@ class MedicalChatBot:
     def generate_response(self, user_input: str) -> str:
         """Generate response using chain of thought reasoning"""
         try:
-            # Check for symptoms in user input
-            symptoms = self.extract_symptoms(user_input)
-            prognosis_response = ""
-            if symptoms:
-                prognosis_response = self.predict_prognosis(symptoms)
-            
-            # Create chat messages for response
             messages = [
                 {"role": "system", "content": self.system_prompt},
                 *[{"role": m.role, "content": m.content} for m in self.conversation_history],
@@ -130,14 +99,11 @@ class MedicalChatBot:
             response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=messages,
+                # temperature=0.7,
+                # max_tokens=500
             )
 
-            # Combine AI response with prognosis if available
-            full_response = response.choices[0].message.content
-            if prognosis_response:
-                full_response += f"\n\nBased on your symptoms, the likely condition is: {prognosis_response}."
-            
-            return full_response
+            return response.choices[0].message.content
             
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
@@ -154,31 +120,28 @@ class MedicalChatBot:
             ChatMessage(role="assistant", content=bot_response, timestamp=timestamp)
         )
 
-    def predict_prognosis(self, symptoms: List[str]) -> str:
-        """Predict prognosis based on symptoms"""
-        input_vector = np.zeros(len(self.symptom_columns))
-        for symptom in symptoms:
-            if symptom in self.symptom_columns:
-                input_vector[self.symptom_columns.index(symptom)] = 1
-
-        prediction = self.decision_tree.predict([input_vector])[0]
-        return prediction
-
-    def extract_symptoms(self, user_input: str) -> List[str]:
-        """Extract symptoms mentioned in user input"""
-        return [symptom for symptom in self.symptom_columns if symptom.lower() in user_input.lower()]
-
 def create_demo() -> gr.Blocks:
     """Create Gradio interface with professional styling"""
     chatbot = MedicalChatBot()
 
     with gr.Blocks(css=CUSTOM_CSS) as demo:
         gr.Markdown("# 🏥 HealthMate AI")
-        gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
+        gr.Markdown("""
+        Welcome! I'm an AI medical assistant designed to provide general medical information.
+        Please note that I'm not a replacement for professional medical care.
+        """)
 
-        chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True)
+        chatbot_component = gr.Chatbot(
+            label="Conversation History",
+            height=400,
+            show_label=True,
+        )
         
-        msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
+        msg = gr.Textbox(
+            label="Your Message",
+            placeholder="Type your medical concern here...",
+            lines=2
+        )
 
         with gr.Row():
             submit = gr.Button("Send", variant="primary")
@@ -192,17 +155,34 @@ def create_demo() -> gr.Blocks:
 
         def clear_history() -> List[Tuple[str, str]]:
             chatbot.conversation_history.clear()
-            return []
+            return None
 
-        submit.click(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
-        clear.click(clear_history, outputs=[chatbot_component])
-        msg.submit(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
+        submit.click(
+            user_input,
+            inputs=[msg, chatbot_component],
+            outputs=[msg, chatbot_component]
+        )
+
+        clear.click(
+            clear_history,
+            outputs=[chatbot_component],
+        )
+
+        msg.submit(
+            user_input,
+            inputs=[msg, chatbot_component],
+            outputs=[msg, chatbot_component]
+        )
 
     return demo
 
 if __name__ == "__main__":
     try:
         demo = create_demo()
-        demo.launch(server_port=7862, share=True)
+        demo.launch(
+            # server_name="0.0.0.0",
+            server_port=7860,
+            share=True
+        )
     except Exception as e:
         logger.error(f"Failed to launch interface: {str(e)}")
