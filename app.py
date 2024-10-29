@@ -191,6 +191,37 @@ class MedicalChatBot:
         """Extract symptoms mentioned in user input"""
         return [symptom for symptom in self.symptom_columns if symptom.lower() in user_input.lower()]
 
+# def create_demo() -> gr.Blocks:
+#     """Create Gradio interface with professional styling"""
+#     chatbot = MedicalChatBot()
+
+#     with gr.Blocks(css=CUSTOM_CSS) as demo:
+#         gr.Markdown("# 🏥 HealthMate AI")
+#         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
+
+#         chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True)
+        
+#         msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
+
+#         with gr.Row():
+#             submit = gr.Button("Send", variant="primary")
+#             clear = gr.Button("Clear Chat", variant="secondary")
+
+#         def user_input(message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[str, str]]]:
+#             bot_response = chatbot.generate_response(message)
+#             chatbot._update_history(message, bot_response)
+#             history.append((message, bot_response))
+#             return "", history
+
+#         def clear_history() -> List[Tuple[str, str]]:
+#             chatbot.conversation_history.clear()
+#             return []
+
+#         submit.click(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
+#         clear.click(clear_history, outputs=[chatbot_component])
+#         msg.submit(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
+
+#     return demo
 def create_demo() -> gr.Blocks:
     """Create Gradio interface with professional styling"""
     chatbot = MedicalChatBot()
@@ -199,7 +230,8 @@ def create_demo() -> gr.Blocks:
         gr.Markdown("# 🏥 HealthMate AI")
         gr.Markdown("""Welcome! I'm an AI medical assistant designed to provide general medical information. Please note that I'm not a replacement for professional medical care.""")
 
-        chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True)
+        # Specify type='messages' for the chatbot component
+        chatbot_component = gr.Chatbot(label="Conversation History", height=400, show_label=True, type='messages')
         
         msg = gr.Textbox(label="Your Message", placeholder="Type your medical concern here...", lines=2)
 
@@ -222,6 +254,7 @@ def create_demo() -> gr.Blocks:
         msg.submit(user_input, inputs=[msg, chatbot_component], outputs=[msg, chatbot_component])
 
     return demo
+
 
 if __name__ == "__main__":
     try:
